@@ -12,14 +12,17 @@
   <div id="ui">
     <button id="add-bed">Добавить кровать</button>
     <button id="add-table">Добавить стол</button>
-    <input id="seed-input" placeholder="Вставьте сид или нажмите «Сгенерировать»"/>
+    <button id="rotate-item">Повернуть выбранный</button>
+    <input id="seed-input" placeholder="Вставьте сид или нажмите «Сгенерировать" />
     <button id="load-seed">Загрузить сид</button>
     <button id="generate-seed">Сгенерировать сид</button>
-    <textarea id="seed-output" readonly rows="3"></textarea>
+    <button id="copy-seed">Копировать сид</button>
+    <textarea id="seed-output" readonly rows="2"></textarea>
   </div>
 
   <!-- PixiJS с CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.2.0/pixi.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
   <script src="main.js"></script>
 </body>
 </html>

@@ -1,1 +1,45 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
+#game-container {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d0d0d0;
+}
+
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+#ui {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  background: #fafafa;
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+}
+
+#ui button,
+#ui input,
+#ui textarea {
+  font-size: 1rem;
+}
+
+#seed-output {
+  flex: 1 1 100%;
+}
+
+@media (min-width: 600px) {
+  #ui {
+    justify-content: center;
+  }
+}

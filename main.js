@@ -30,20 +30,47 @@ const furnitureDefs = {
   table: { w: 1, h: 1, color: 0x4444ff }
 };
 
-// Рисуем сетку
+function getItemSize(item) {
+  const def = furnitureDefs[item.type];
+  return item.rotation % 180 === 0 ? { w: def.w, h: def.h } : { w: def.h, h: def.w };
+}
+
+function clampItem(item) {
+  const size = getItemSize(item);
+  if (item.x < 0) item.x = 0;
+  if (item.y < 0) item.y = 0;
+  if (item.x > GRID_SIZE - size.w) item.x = GRID_SIZE - size.w;
+  if (item.y > GRID_SIZE - size.h) item.y = GRID_SIZE - size.h;
+}
+
+// Рисуем сетку с двумя стенами
 function drawGrid() {
   gridContainer.removeChildren();
   const g = new PIXI.Graphics();
+
+  // пол
+  g.beginFill(roomState.floorColor);
+  g.drawRect(OFFSET_X, OFFSET_Y, GRID_SIZE * TILE_SIZE, GRID_SIZE * TILE_SIZE);
+  g.endFill();
+
+  // стены
+  g.beginFill(0xe8e8e8);
+  g.drawRect(OFFSET_X - TILE_SIZE, OFFSET_Y - GRID_SIZE * TILE_SIZE, GRID_SIZE * TILE_SIZE, GRID_SIZE * TILE_SIZE);
+  g.endFill();
+  g.beginFill(0xf5f5f5);
+  g.drawRect(OFFSET_X - TILE_SIZE, OFFSET_Y - GRID_SIZE * TILE_SIZE, TILE_SIZE, GRID_SIZE * TILE_SIZE + TILE_SIZE);
+  g.endFill();
+
+  // линии сетки на полу
   g.lineStyle(1, 0x888888);
-  for (let i=0; i<=GRID_SIZE; i++) {
-    // вертикальные линии
-    g.moveTo(OFFSET_X + i*TILE_SIZE, OFFSET_Y);
-    g.lineTo(OFFSET_X + i*TILE_SIZE, OFFSET_Y + GRID_SIZE*TILE_SIZE);
+  for (let i = 0; i <= GRID_SIZE; i++) {
+    // вертикальные
+    g.moveTo(OFFSET_X + i * TILE_SIZE, OFFSET_Y);
+    g.lineTo(OFFSET_X + i * TILE_SIZE, OFFSET_Y + GRID_SIZE * TILE_SIZE);
     // горизонтальные
-    g.moveTo(OFFSET_X, OFFSET_Y + i*TILE_SIZE);
-    g.lineTo(OFFSET_X + GRID_SIZE*TILE_SIZE, OFFSET_Y + i*TILE_SIZE);
+    g.moveTo(OFFSET_X, OFFSET_Y + i * TILE_SIZE);
+    g.lineTo(OFFSET_X + GRID_SIZE * TILE_SIZE, OFFSET_Y + i * TILE_SIZE);
   }
-  app.stage.addChild(g);
   gridContainer.addChild(g);
 }
 drawGrid();
@@ -58,32 +85,75 @@ function addFurniture(type) {
 }
 
 // Отрисовать всю мебель
+let dragging = null;
+let lastClick = 0;
+let selectedItem = null;
+
+function createSprite(item) {
+  const size = getItemSize(item);
+  const g = new PIXI.Graphics();
+  g.beginFill(item.color);
+  g.drawRect(0, 0, size.w * TILE_SIZE, size.h * TILE_SIZE);
+  g.endFill();
+  g.x = OFFSET_X + item.x * TILE_SIZE;
+  g.y = OFFSET_Y + (GRID_SIZE - size.h - item.y) * TILE_SIZE;
+  g.interactive = true;
+  g.buttonMode = true;
+  g.item = item;
+  g
+    .on('pointerdown', onPointerDown)
+    .on('pointerup', onPointerUp)
+    .on('pointerupoutside', onPointerUp)
+    .on('pointermove', onPointerMove);
+  return g;
+}
+
+function onPointerDown(e) {
+  const now = Date.now();
+  if (now - lastClick < 300) {
+    selectedItem = this.item;
+    selectedItem.rotation = (selectedItem.rotation + 90) % 360;
+    clampItem(selectedItem);
+    drawFurniture();
+    lastClick = 0;
+    return;
+  }
+  lastClick = now;
+  selectedItem = this.item;
+  dragging = { data: e.data, item: this.item, offset: e.data.getLocalPosition(this) };
+}
+
+function onPointerMove(e) {
+  if (!dragging) return;
+  const pos = dragging.data.getLocalPosition(furnitureContainer);
+  const size = getItemSize(dragging.item);
+  dragging.item.x = Math.round((pos.x - dragging.offset.x - OFFSET_X) / TILE_SIZE);
+  dragging.item.y = Math.round((OFFSET_Y + GRID_SIZE * TILE_SIZE - pos.y - dragging.offset.y - size.h * TILE_SIZE) / TILE_SIZE);
+  clampItem(dragging.item);
+  drawFurniture();
+}
+
+function onPointerUp() {
+  dragging = null;
+}
+
 function drawFurniture() {
   furnitureContainer.removeChildren();
   roomState.items.forEach(item => {
-    const def = furnitureDefs[item.type];
-    const g = new PIXI.Graphics();
-    g.beginFill(item.color);
-    g.drawRect(0, 0, def.w * TILE_SIZE, def.h * TILE_SIZE);
-    g.endFill();
-    // позиция и поворот (в квадратах)
-    g.x = OFFSET_X + item.x * TILE_SIZE;
-    g.y = OFFSET_Y + (GRID_SIZE - def.h - item.y) * TILE_SIZE;
-    g.rotation = item.rotation * Math.PI/180;
-    furnitureContainer.addChild(g);
+    furnitureContainer.addChild(createSprite(item));
   });
 }
 
-// Генерация Base64-сида
+// Генерация сида
 function generateSeed() {
   const str = JSON.stringify(roomState);
-  return btoa(str);
+  return LZString.compressToEncodedURIComponent(str);
 }
 
 // Загрузка из сида
 function loadSeed(seed) {
   try {
-    const json = atob(seed.trim());
+    const json = LZString.decompressFromEncodedURIComponent(seed.trim());
     roomState = JSON.parse(json);
     drawFurniture();
     document.getElementById('seed-output').value = seed;
@@ -101,4 +171,19 @@ document.getElementById('generate-seed').onclick = () => {
 document.getElementById('load-seed').onclick = () => {
   const seed = document.getElementById('seed-input').value;
   loadSeed(seed);
+};
+document.getElementById('copy-seed').onclick = async () => {
+  const seed = document.getElementById('seed-output').value;
+  try {
+    await navigator.clipboard.writeText(seed);
+  } catch (e) {
+    /* clipboard access failed */
+  }
+};
+document.getElementById('rotate-item').onclick = () => {
+  if (selectedItem) {
+    selectedItem.rotation = (selectedItem.rotation + 90) % 360;
+    clampItem(selectedItem);
+    drawFurniture();
+  }
 };
