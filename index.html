@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="style.css"/>
+  <title>Room Designer</title>
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <div id="ui">
+    <button id="add-bed">Добавить кровать</button>
+    <button id="add-table">Добавить стол</button>
+    <input id="seed-input" placeholder="Вставьте сид или нажмите «Сгенерировать»"/>
+    <button id="load-seed">Загрузить сид</button>
+    <button id="generate-seed">Сгенерировать сид</button>
+    <textarea id="seed-output" readonly rows="3"></textarea>
+  </div>
+
+  <!-- PixiJS с CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.2.0/pixi.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
