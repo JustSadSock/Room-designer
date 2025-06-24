@@ -7,17 +7,39 @@
   <title>Room Designer</title>
 </head>
 <body>
-  <div id="game-container"></div>
+  <div id="game-container">
+    <div id="room1" class="room"></div>
+    <div id="room2" class="room" style="display:none"></div>
+  </div>
 
   <div id="ui">
-    <button id="add-bed">Добавить кровать</button>
-    <button id="add-table">Добавить стол</button>
-    <button id="rotate-item">Повернуть выбранный</button>
-    <input id="seed-input" placeholder="Вставьте сид или нажмите «Сгенерировать" />
-    <button id="load-seed">Загрузить сид</button>
-    <button id="generate-seed">Сгенерировать сид</button>
-    <button id="copy-seed">Копировать сид</button>
+    <select id="item-select">
+      <optgroup label="\u041a\u0440\u043e\u0432\u0430\u0442\u0438">
+        <option value="bed">\u041a\u0440\u043e\u0432\u0430\u0442\u044c</option>
+      </optgroup>
+      <optgroup label="\u0421\u0442\u043e\u043b\u044b">
+        <option value="table">\u0421\u0442\u043e\u043b</option>
+      </optgroup>
+      <optgroup label="\u0421\u0442\u0443\u043b\u044c\u044f">
+        <option value="chair">\u0421\u0442\u0443\u043b</option>
+      </optgroup>
+      <optgroup label="\u0414\u0435\u043a\u043e\u0440">
+        <option value="plant">\u0420\u0430\u0441\u0442\u0435\u043d\u0438\u0435</option>
+      </optgroup>
+    </select>
+    <button id="add-item">\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c</button>
+    <button id="rotate-item">\u041f\u043e\u0432\u0435\u0440\u043d\u0443\u0442\u044c \u0432\u044b\u0431\u0440\u0430\u043d\u043d\u044b\u0439</button>
+    <label>\u041f\u043e\u043b <input id="floor-color" type="color" value="#ffffff" /></label>
+    <label>\u0421\u0442\u0435\u043d\u044b <input id="wall-color" type="color" value="#e8e8e8" /></label>
+    <input id="seed-input" placeholder="\u0421\u0438\u0434 1" />
+    <button id="load-seed">\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c</button>
+    <button id="generate-seed">\u0421\u0433\u0435\u043d\u0435\u0440\u0438\u0440\u043e\u0432\u0430\u0442\u044c</button>
+    <button id="copy-seed">\u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c</button>
     <textarea id="seed-output" readonly rows="2"></textarea>
+    <input id="seed-input-2" placeholder="\u0421\u0438\u0434 2" />
+    <button id="load-seed-2">\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c 2</button>
+    <button id="compare-seeds">\u0421\u0440\u0430\u0432\u043d\u0438\u0442\u044c</button>
+    <div id="compare-output"></div>
   </div>
 
   <!-- PixiJS с CDN -->
