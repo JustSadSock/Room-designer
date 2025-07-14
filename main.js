@@ -239,6 +239,16 @@ document.getElementById('rotate-item').onclick = () => {
     drawFurniture(furnitureContainer1, roomState);
   }
 };
+document.getElementById('delete-item').onclick = () => {
+  if (selectedItem) {
+    const idx = roomState.items.indexOf(selectedItem);
+    if (idx !== -1) {
+      roomState.items.splice(idx, 1);
+      selectedItem = null;
+      drawFurniture(furnitureContainer1, roomState);
+    }
+  }
+};
 document.getElementById('floor-color').oninput = e => {
   roomState.floorColor = parseInt(e.target.value.replace('#','0x'));
   drawGrid(gridContainer1, roomState);
@@ -259,3 +269,16 @@ document.getElementById('compare-seeds').onclick = () => {
   const score = compareRooms(json1, json2);
   document.getElementById('compare-output').textContent = 'Совпадение: ' + score + '%';
 };
+
+window.addEventListener('keydown', e => {
+  if (e.key === 'Delete') {
+    if (selectedItem) {
+      const idx = roomState.items.indexOf(selectedItem);
+      if (idx !== -1) {
+        roomState.items.splice(idx, 1);
+        selectedItem = null;
+        drawFurniture(furnitureContainer1, roomState);
+      }
+    }
+  }
+});
